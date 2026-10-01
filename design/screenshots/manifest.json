@@ -1,0 +1,268 @@
+{
+ "captured": "2026-10-01",
+ "roles": [
+  {
+   "role": "student",
+   "user": "student1",
+   "who": "Sam Student (student1)"
+  },
+  {
+   "role": "teacher",
+   "user": "janderson",
+   "who": "Dr John Anderson (janderson)"
+  },
+  {
+   "role": "admin",
+   "user": "admin1",
+   "who": "Alice Admin (admin1)"
+  }
+ ],
+ "shots": [
+  {
+   "role": "login",
+   "title": "Login",
+   "route": "/",
+   "file": "login/01-login.jpg"
+  },
+  {
+   "role": "student",
+   "title": "Dashboard",
+   "route": "#/dashboard",
+   "file": "student/01-dashboard.jpg",
+   "who": "Sam Student (student1)",
+   "height": 1056
+  },
+  {
+   "role": "student",
+   "title": "Schedule",
+   "route": "#/schedule",
+   "file": "student/02-schedule.jpg",
+   "who": "Sam Student (student1)",
+   "height": 900
+  },
+  {
+   "role": "student",
+   "title": "Browse classes (enrol / drop)",
+   "route": "#/schedule/browse",
+   "file": "student/03-browse-classes-enrol-drop.jpg",
+   "who": "Sam Student (student1)",
+   "height": 2019
+  },
+  {
+   "role": "student",
+   "title": "My Classes",
+   "route": "#/my-classes",
+   "file": "student/04-my-classes.jpg",
+   "who": "Sam Student (student1)",
+   "height": 900
+  },
+  {
+   "role": "student",
+   "title": "Learning — term lesson plan",
+   "route": "#/learning",
+   "file": "student/05-learning-term-lesson-plan.jpg",
+   "who": "Sam Student (student1)",
+   "height": 2701
+  },
+  {
+   "role": "student",
+   "title": "Assessments — weekly / monthly view",
+   "route": "#/assessments",
+   "file": "student/06-assessments-weekly-monthly-view.jpg",
+   "who": "Sam Student (student1)",
+   "height": 900
+  },
+  {
+   "role": "student",
+   "title": "Assessment details — assignment with submission form",
+   "route": "#/assessments/lab-report",
+   "file": "student/07-assessment-details-assignment-with-submission-form.jpg",
+   "who": "Sam Student (student1)",
+   "height": 1240
+  },
+  {
+   "role": "student",
+   "title": "Assessment details — completed quiz with My Submission",
+   "route": "#/assessments/unit2-quiz",
+   "file": "student/08-assessment-details-completed-quiz-with-my-submission.jpg",
+   "who": "Sam Student (student1)",
+   "height": 3482
+  },
+  {
+   "role": "student",
+   "title": "Quiz review",
+   "route": "#/assessments/unit2-quiz/review",
+   "file": "student/09-quiz-review.jpg",
+   "who": "Sam Student (student1)",
+   "height": 996
+  },
+  {
+   "role": "student",
+   "title": "Payments",
+   "route": "#/payments",
+   "file": "student/10-payments.jpg",
+   "who": "Sam Student (student1)",
+   "height": 900
+  },
+  {
+   "role": "student",
+   "title": "Profile",
+   "route": "#/profile",
+   "file": "student/11-profile.jpg",
+   "who": "Sam Student (student1)",
+   "height": 900
+  },
+  {
+   "role": "teacher",
+   "title": "Dashboard",
+   "route": "#/dashboard",
+   "file": "teacher/01-dashboard.jpg",
+   "who": "Dr John Anderson (janderson)",
+   "height": 900
+  },
+  {
+   "role": "teacher",
+   "title": "Schedule — classes I teach",
+   "route": "#/schedule",
+   "file": "teacher/02-schedule-classes-i-teach.jpg",
+   "who": "Dr John Anderson (janderson)",
+   "height": 900
+  },
+  {
+   "role": "teacher",
+   "title": "My Classes",
+   "route": "#/my-classes",
+   "file": "teacher/03-my-classes.jpg",
+   "who": "Dr John Anderson (janderson)",
+   "height": 900
+  },
+  {
+   "role": "teacher",
+   "title": "Students",
+   "route": "#/students",
+   "file": "teacher/04-students.jpg",
+   "who": "Dr John Anderson (janderson)",
+   "height": 970
+  },
+  {
+   "role": "teacher",
+   "title": "Learning — lesson plans with Mark complete",
+   "route": "#/learning",
+   "file": "teacher/05-learning-lesson-plans-with-mark-complete.jpg",
+   "who": "Dr John Anderson (janderson)",
+   "height": 2241
+  },
+  {
+   "role": "teacher",
+   "title": "Assessments",
+   "route": "#/assessments",
+   "file": "teacher/06-assessments.jpg",
+   "who": "Dr John Anderson (janderson)",
+   "height": 900
+  },
+  {
+   "role": "teacher",
+   "title": "New assessment (editor)",
+   "route": "#/assessments/new",
+   "file": "teacher/07-new-assessment-editor.jpg",
+   "who": "Dr John Anderson (janderson)",
+   "height": 911
+  },
+  {
+   "role": "teacher",
+   "title": "Edit assessment",
+   "route": "#/assessments/unit2-quiz/edit",
+   "file": "teacher/08-edit-assessment.jpg",
+   "who": "Dr John Anderson (janderson)",
+   "height": 911
+  },
+  {
+   "role": "teacher",
+   "title": "Submissions (review + grading)",
+   "route": "#/assessments/submissions",
+   "file": "teacher/09-submissions-review-grading.jpg",
+   "who": "Dr John Anderson (janderson)",
+   "height": 1987
+  },
+  {
+   "role": "teacher",
+   "title": "Profile",
+   "route": "#/profile",
+   "file": "teacher/10-profile.jpg",
+   "who": "Dr John Anderson (janderson)",
+   "height": 900
+  },
+  {
+   "role": "admin",
+   "title": "Dashboard",
+   "route": "#/dashboard",
+   "file": "admin/01-dashboard.jpg",
+   "who": "Alice Admin (admin1)",
+   "height": 1719
+  },
+  {
+   "role": "admin",
+   "title": "All Schedule",
+   "route": "#/schedule",
+   "file": "admin/02-all-schedule.jpg",
+   "who": "Alice Admin (admin1)",
+   "height": 1221
+  },
+  {
+   "role": "admin",
+   "title": "Learning — every lesson plan",
+   "route": "#/learning",
+   "file": "admin/03-learning-every-lesson-plan.jpg",
+   "who": "Alice Admin (admin1)",
+   "height": 2889
+  },
+  {
+   "role": "admin",
+   "title": "Assessments — all teachers",
+   "route": "#/assessments",
+   "file": "admin/04-assessments-all-teachers.jpg",
+   "who": "Alice Admin (admin1)",
+   "height": 900
+  },
+  {
+   "role": "admin",
+   "title": "Payments — all students",
+   "route": "#/payments",
+   "file": "admin/05-payments-all-students.jpg",
+   "who": "Alice Admin (admin1)",
+   "height": 2659
+  },
+  {
+   "role": "admin",
+   "title": "Users",
+   "route": "#/admin/users",
+   "file": "admin/06-users.jpg",
+   "who": "Alice Admin (admin1)",
+   "height": 1731
+  },
+  {
+   "role": "admin",
+   "title": "Subjects",
+   "route": "#/admin/subjects",
+   "file": "admin/07-subjects.jpg",
+   "who": "Alice Admin (admin1)",
+   "height": 1232
+  },
+  {
+   "role": "admin",
+   "title": "Enrollment",
+   "route": "#/admin/enrollment",
+   "file": "admin/08-enrollment.jpg",
+   "who": "Alice Admin (admin1)",
+   "height": 1809
+  },
+  {
+   "role": "admin",
+   "title": "Profile",
+   "route": "#/profile",
+   "file": "admin/09-profile.jpg",
+   "who": "Alice Admin (admin1)",
+   "height": 900
+  }
+ ]
+}
