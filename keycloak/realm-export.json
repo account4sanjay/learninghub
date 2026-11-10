@@ -1,0 +1,593 @@
+{
+  "realm": "learninghub",
+  "displayName": "LearningHub",
+  "displayNameHtml": "LearningHub",
+  "enabled": true,
+  "sslRequired": "none",
+  "registrationAllowed": false,
+  "loginWithEmailAllowed": true,
+  "duplicateEmailsAllowed": false,
+  "resetPasswordAllowed": true,
+  "bruteForceProtected": true,
+  "accessTokenLifespan": 1800,
+  "ssoSessionIdleTimeout": 3600,
+  "roles": {
+    "realm": [
+      {
+        "name": "admin",
+        "description": "Administrators: manage students, teachers, subjects, classes, assignments, schedule, payments, analytics"
+      },
+      {
+        "name": "teacher",
+        "description": "Teachers: my classes, my subjects, schedule, learning content, assessments/grading, analytics"
+      },
+      {
+        "name": "student",
+        "description": "Students: my classes, schedule, learning, assessments, payments, analytics"
+      }
+    ]
+  },
+  "users": [
+    {
+      "username": "admin1",
+      "enabled": true,
+      "firstName": "Alice",
+      "lastName": "Admin",
+      "email": "admin1@learninghub.local",
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "admin123",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "admin"
+      ]
+    },
+    {
+      "username": "teacher1",
+      "enabled": true,
+      "firstName": "Tom",
+      "lastName": "Teacher",
+      "email": "teacher1@learninghub.local",
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "teacher123",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "teacher"
+      ]
+    },
+    {
+      "username": "student1",
+      "enabled": true,
+      "firstName": "Sam",
+      "lastName": "Student",
+      "email": "student1@learninghub.local",
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "student123",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "student"
+      ]
+    },
+    {
+      "username": "janderson",
+      "enabled": true,
+      "firstName": "John",
+      "lastName": "Anderson",
+      "email": "janderson@learninghub.local",
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "teacher123",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "teacher"
+      ]
+    },
+    {
+      "username": "ecarter",
+      "enabled": true,
+      "firstName": "Emily",
+      "lastName": "Carter",
+      "email": "ecarter@learninghub.local",
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "teacher123",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "teacher"
+      ]
+    },
+    {
+      "username": "swilson",
+      "enabled": true,
+      "firstName": "Sarah",
+      "lastName": "Wilson",
+      "email": "swilson@learninghub.local",
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "teacher123",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "teacher"
+      ]
+    },
+    {
+      "username": "dlee",
+      "enabled": true,
+      "firstName": "David",
+      "lastName": "Lee",
+      "email": "dlee@learninghub.local",
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "teacher123",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "teacher"
+      ]
+    },
+    {
+      "username": "ppatel",
+      "enabled": true,
+      "firstName": "Priya",
+      "lastName": "Patel",
+      "email": "ppatel@learninghub.local",
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "teacher123",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "teacher"
+      ]
+    },
+    {
+      "username": "service-account-learninghub-user-admin",
+      "enabled": true,
+      "serviceAccountClientId": "learninghub-user-admin",
+      "clientRoles": {
+        "realm-management": [
+          "manage-users",
+          "view-users",
+          "query-users",
+          "view-realm"
+        ]
+      }
+    },
+    {
+      "username": "ajohnson",
+      "enabled": true,
+      "firstName": "Ava",
+      "lastName": "Johnson",
+      "email": "ajohnson@learninghub.local",
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "student123",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "student"
+      ]
+    },
+    {
+      "username": "lbrown",
+      "enabled": true,
+      "firstName": "Liam",
+      "lastName": "Brown",
+      "email": "lbrown@learninghub.local",
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "student123",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "student"
+      ]
+    },
+    {
+      "username": "mdavis",
+      "enabled": true,
+      "firstName": "Mia",
+      "lastName": "Davis",
+      "email": "mdavis@learninghub.local",
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "student123",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "student"
+      ]
+    },
+    {
+      "username": "nwilson",
+      "enabled": true,
+      "firstName": "Noah",
+      "lastName": "Wilson",
+      "email": "nwilson@learninghub.local",
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "student123",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "student"
+      ]
+    },
+    {
+      "username": "zmartinez",
+      "enabled": true,
+      "firstName": "Zoe",
+      "lastName": "Martinez",
+      "email": "zmartinez@learninghub.local",
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "student123",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "student"
+      ]
+    },
+    {
+      "username": "egarcia",
+      "enabled": true,
+      "firstName": "Ethan",
+      "lastName": "Garcia",
+      "email": "egarcia@learninghub.local",
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "student123",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "student"
+      ]
+    },
+    {
+      "username": "omiller",
+      "enabled": true,
+      "firstName": "Olivia",
+      "lastName": "Miller",
+      "email": "omiller@learninghub.local",
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "student123",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "student"
+      ]
+    },
+    {
+      "username": "lrodriguez",
+      "enabled": true,
+      "firstName": "Lucas",
+      "lastName": "Rodriguez",
+      "email": "lrodriguez@learninghub.local",
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "student123",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "student"
+      ]
+    },
+    {
+      "username": "elopez",
+      "enabled": true,
+      "firstName": "Emma",
+      "lastName": "Lopez",
+      "email": "elopez@learninghub.local",
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "student123",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "student"
+      ]
+    },
+    {
+      "username": "aclark",
+      "enabled": true,
+      "firstName": "Aiden",
+      "lastName": "Clark",
+      "email": "aclark@learninghub.local",
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "student123",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "student"
+      ]
+    },
+    {
+      "username": "slewis",
+      "enabled": true,
+      "firstName": "Sophia",
+      "lastName": "Lewis",
+      "email": "slewis@learninghub.local",
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "student123",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "student"
+      ]
+    },
+    {
+      "username": "mwalker",
+      "enabled": true,
+      "firstName": "Mason",
+      "lastName": "Walker",
+      "email": "mwalker@learninghub.local",
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "student123",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "student"
+      ]
+    },
+    {
+      "username": "ihall",
+      "enabled": true,
+      "firstName": "Isabella",
+      "lastName": "Hall",
+      "email": "ihall@learninghub.local",
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "student123",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "student"
+      ]
+    },
+    {
+      "username": "lyoung",
+      "enabled": true,
+      "firstName": "Logan",
+      "lastName": "Young",
+      "email": "lyoung@learninghub.local",
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "student123",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "student"
+      ]
+    },
+    {
+      "username": "cking",
+      "enabled": true,
+      "firstName": "Chloe",
+      "lastName": "King",
+      "email": "cking@learninghub.local",
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "student123",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "student"
+      ]
+    },
+    {
+      "username": "jwright",
+      "enabled": true,
+      "firstName": "Jacob",
+      "lastName": "Wright",
+      "email": "jwright@learninghub.local",
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "student123",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "student"
+      ]
+    },
+    {
+      "username": "lscott",
+      "enabled": true,
+      "firstName": "Lily",
+      "lastName": "Scott",
+      "email": "lscott@learninghub.local",
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "student123",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "student"
+      ]
+    },
+    {
+      "username": "egreen",
+      "enabled": true,
+      "firstName": "Elijah",
+      "lastName": "Green",
+      "email": "egreen@learninghub.local",
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "student123",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "student"
+      ]
+    },
+    {
+      "username": "gadams",
+      "enabled": true,
+      "firstName": "Grace",
+      "lastName": "Adams",
+      "email": "gadams@learninghub.local",
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "student123",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "student"
+      ]
+    },
+    {
+      "username": "obaker",
+      "enabled": true,
+      "firstName": "Owen",
+      "lastName": "Baker",
+      "email": "obaker@learninghub.local",
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "student123",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "student"
+      ]
+    }
+  ],
+  "clients": [
+    {
+      "clientId": "learninghub-frontend",
+      "name": "LearningHub Frontend",
+      "enabled": true,
+      "publicClient": true,
+      "protocol": "openid-connect",
+      "standardFlowEnabled": true,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": true,
+      "rootUrl": "http://localhost:8080",
+      "baseUrl": "http://localhost:8080",
+      "redirectUris": [
+        "http://localhost:8080/*",
+        "http://localhost/*",
+        "http://localhost:5173/*"
+      ],
+      "webOrigins": [
+        "http://localhost:8080",
+        "http://localhost",
+        "http://localhost:5173"
+      ],
+      "attributes": {
+        "pkce.code.challenge.method": "S256",
+        "post.logout.redirect.uris": "+"
+      }
+    },
+    {
+      "clientId": "learninghub-user-admin",
+      "name": "LearningHub User Service (admin API)",
+      "description": "Service account used by user-service to create, update, suspend and delete users through the Keycloak Admin REST API",
+      "enabled": true,
+      "publicClient": false,
+      "clientAuthenticatorType": "client-secret",
+      "secret": "learninghub-user-admin-secret",
+      "protocol": "openid-connect",
+      "standardFlowEnabled": false,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "serviceAccountsEnabled": true,
+      "redirectUris": [],
+      "webOrigins": []
+    }
+  ]
+}

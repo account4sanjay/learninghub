@@ -1,0 +1,52 @@
+<script>
+  let { name, size = 18 } = $props()
+  const PATHS = {
+    home: 'M3 10.5 12 3l9 7.5V21a1 1 0 0 1-1 1h-5v-7h-6v7H4a1 1 0 0 1-1-1z',
+    classes: 'M4 5a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v14l-4-2-4 2-4-2-4 2z',
+    schedule: 'M7 2v3M17 2v3M4 8h16M5 4h14a1 1 0 0 1 1 1v15a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1z',
+    learning: 'M12 3 2 8l10 5 8-4v6h2V8zM6 12v4c0 1.5 2.7 3 6 3s6-1.5 6-3v-4l-6 3z',
+    assessments: 'M9 3h6a1 1 0 0 1 1 1v1h3v16H5V5h3V4a1 1 0 0 1 1-1zm0 3H7v13h10V6h-2v1H9zm1 5 2 2 4-4',
+    payments: 'M3 7a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2zm0 3h18M6 15h4',
+    analytics: 'M4 20V10m5 10V4m5 16v-7m5 7V8',
+    profile: 'M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zm-8 9a8 8 0 0 1 16 0',
+    search: 'M11 4a7 7 0 1 0 0 14 7 7 0 0 0 0-14zm10 17-4.35-4.35',
+    bell: 'M12 3a6 6 0 0 0-6 6v3.6L4.4 15.6a1 1 0 0 0 .9 1.4h13.4a1 1 0 0 0 .9-1.4L18 12.6V9a6 6 0 0 0-6-6zm-2 15a2 2 0 0 0 4 0',
+    'chevron-right': 'm9 6 6 6-6 6',
+    'chevron-left': 'm15 6-6 6 6 6',
+    'chevron-down': 'm6 9 6 6 6-6',
+    check: 'm5 13 4 4L19 7',
+    x: 'M6 6l12 12M18 6 6 18',
+    clock: 'M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20zm0-14v6l4 2',
+    calendar: 'M7 2v3M17 2v3M4 8h16M5 4h14a1 1 0 0 1 1 1v15a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1z',
+    video: 'M4 5h11a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1zm12 5 5-3v10l-5-3z',
+    pdf: 'M6 2h9l5 5v15H6zM14 2v6h6M9 13h6M9 17h6',
+    doc: 'M6 2h9l5 5v15H6zM14 2v6h6M9 13h6M9 17h4',
+    link: 'M10 14a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1.5 1.5M14 10a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1.5-1.5',
+    practice: 'M12 2 2 7l10 5 10-5zM2 17l10 5 10-5M2 12l10 5 10-5',
+    download: 'M12 3v12m0 0 4-4m-4 4-4-4M4 21h16',
+    upload: 'M12 21V9m0 0-4 4m4-4 4 4M4 3h16',
+    trophy: 'M8 21h8m-4-4v4m-6-17h12v5a6 6 0 0 1-12 0zM6 4H3v2a4 4 0 0 0 3 3.87M18 4h3v2a4 4 0 0 1-3 3.87',
+    target: 'M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20zm0-5a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm0-5h.01',
+    megaphone: 'M3 11v3l4 1 11 5V4L7 9H3zm15 1h3',
+    flask: 'M9 2v6L4 18a2 2 0 0 0 1.8 3h12.4A2 2 0 0 0 20 18L15 8V2M7 2h10',
+    chart: 'M4 20V10m5 10V4m5 16v-7m5 7V8',
+    flag: 'M5 21V4a1 1 0 0 1 1-1h9l-1 4h5v9h-8l1-4H7',
+    calc: 'M6 2h12a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1zm2 4h8M8 11h.01M12 11h.01M16 11h.01M8 15h.01M12 15h.01M16 15h.01M8 19h.01M12 19h.01M16 19h.01',
+    bookmark: 'M6 3h12a1 1 0 0 1 1 1v17l-7-4-7 4V4a1 1 0 0 1 1-1z',
+    edit: 'M4 20h4L20 8l-4-4L4 16v4zm10-14 4 4',
+    mail: 'M3 5h18a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1zm0 2 9 6 9-6',
+    phone: 'M5 3h4l2 5-2.5 1.5a12 12 0 0 0 6 6L16 13l5 2v4a2 2 0 0 1-2 2A17 17 0 0 1 3 5a2 2 0 0 1 2-2z',
+    pin: 'M12 22s7-6.3 7-12a7 7 0 1 0-14 0c0 5.7 7 12 7 12zm0-9a3 3 0 1 0 0-6 3 3 0 0 0 0 6z',
+    grad: 'M12 3 1 8l11 5 8-3.6V15h2V8zM5 11.2V16c0 1.7 3.1 3 7 3s7-1.3 7-3v-4.8l-7 3.2z',
+    book: 'M4 4a2 2 0 0 1 2-2h14v18H6a2 2 0 0 0-2 2zm2 14h12M6 2v16',
+    play: 'M8 5v14l11-7z',
+    plus: 'M12 5v14M5 12h14',
+    dots: 'M12 6h.01M12 12h.01M12 18h.01',
+    'arrow-up': 'M12 19V5m0 0-6 6m6-6 6 6',
+    logout: 'M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4m7 14 5-5-5-5m5 5H9',
+  }
+</script>
+
+<svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+  <path d={PATHS[name] || PATHS.home} />
+</svg>

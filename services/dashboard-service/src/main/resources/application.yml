@@ -1,0 +1,57 @@
+server:
+  port: 8108
+
+spring:
+  application:
+    name: dashboard-service
+  # Ask 33: no database — every dashboard number is aggregated live from the other services
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          # host-run default; docker-compose overrides via
+          # SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI
+          jwk-set-uri: http://localhost:8180/auth/realms/learninghub/protocol/openid-connect/certs
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+eureka:
+  client:
+    service-url:
+      # host-run default; docker-compose overrides via EUREKA_CLIENT_SERVICEURL_DEFAULTZONE
+      defaultZone: http://localhost:8761/eureka/
+  instance:
+    prefer-ip-address: true
+
+# OpenAPI / Swagger UI, served under the service's gateway prefix so it works at
+# http://localhost:8080/api/dashboard/swagger-ui.html (one UI lists every service)
+springdoc:
+  api-docs:
+    path: /api/dashboard/v3/api-docs
+  swagger-ui:
+    path: /api/dashboard/swagger-ui.html
+    persist-authorization: true          # keep the token across reloads
+    oauth:                                # Ask 31: Authorize = Keycloak password flow through the gateway
+      client-id: learninghub-frontend
+      scopes: openid
+    urls-primary-name: dashboard-service
+    display-request-duration: true
+    urls:
+      - name: user-service
+        url: /api/users/v3/api-docs
+      - name: schedule-service
+        url: /api/schedule/v3/api-docs
+      - name: enrollment-service
+        url: /api/enrollment/v3/api-docs
+      - name: learning-service
+        url: /api/learning/v3/api-docs
+      - name: assessment-service
+        url: /api/assessment/v3/api-docs
+      - name: payment-service
+        url: /api/payments/v3/api-docs
+      - name: dashboard-service
+        url: /api/dashboard/v3/api-docs

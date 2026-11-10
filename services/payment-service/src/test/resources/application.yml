@@ -1,0 +1,22 @@
+spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          # never fetched in unit tests (decoder is lazy); needed so the
+          # resource-server JwtDecoder bean exists for the security config
+          jwk-set-uri: http://localhost:8180/auth/realms/learninghub/protocol/openid-connect/certs
+  datasource:
+    url: jdbc:h2:mem:paymentdb;MODE=PostgreSQL
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: ''
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+  flyway:
+    enabled: false
+
+eureka:
+  client:
+    enabled: false

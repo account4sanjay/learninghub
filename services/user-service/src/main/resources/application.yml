@@ -1,0 +1,80 @@
+server:
+  port: 8101
+
+spring:
+  application:
+    name: user-service
+  servlet:
+    multipart:
+      max-file-size: 2MB
+      max-request-size: 3MB
+  datasource:
+    # host-run default; docker-compose overrides via SPRING_DATASOURCE_URL
+    url: jdbc:postgresql://localhost:6544/userdb
+    username: pguser
+    password: pgpass
+  jpa:
+    hibernate:
+      ddl-auto: validate   # Flyway owns the schema (src/main/resources/db/migration)
+    open-in-view: false
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          # host-run default; docker-compose overrides via
+          # SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI
+          jwk-set-uri: http://localhost:8180/auth/realms/learninghub/protocol/openid-connect/certs
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+eureka:
+  client:
+    service-url:
+      # host-run default; docker-compose overrides via EUREKA_CLIENT_SERVICEURL_DEFAULTZONE
+      defaultZone: http://localhost:8761/eureka/
+  instance:
+    prefer-ip-address: true
+
+learninghub:
+  keycloak:
+    # host-run defaults; docker-compose overrides via LEARNINGHUB_KEYCLOAK_BASEURL
+    base-url: http://localhost:8180/auth
+    realm: learninghub
+    client-id: learninghub-user-admin
+    client-secret: ${LH_KEYCLOAK_ADMIN_CLIENT_SECRET:learninghub-user-admin-secret}
+
+# OpenAPI / Swagger UI, served under the service's gateway prefix so it works at
+# http://localhost:8080/api/users/swagger-ui.html (one UI lists every service)
+springdoc:
+  api-docs:
+    path: /api/users/v3/api-docs
+  swagger-ui:
+    path: /api/users/swagger-ui.html
+    persist-authorization: true          # keep the token across reloads
+    oauth:                                # Authorize = Keycloak password flow through the gateway
+      client-id: learninghub-frontend
+      scopes: openid
+    urls-primary-name: user-service
+    display-request-duration: true
+    urls:
+      - name: user-service
+        url: /api/users/v3/api-docs
+      - name: schedule-service
+        url: /api/schedule/v3/api-docs
+      - name: enrollment-service
+        url: /api/enrollment/v3/api-docs
+      - name: learning-service
+        url: /api/learning/v3/api-docs
+      - name: assessment-service
+        url: /api/assessment/v3/api-docs
+      - name: payment-service
+        url: /api/payments/v3/api-docs
+      - name: dashboard-service
+        url: /api/dashboard/v3/api-docs

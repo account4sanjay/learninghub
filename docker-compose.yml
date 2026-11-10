@@ -1,0 +1,203 @@
+# stub build: its own project name, image tags and host ports, so it runs beside (or instead of) the full stack
+name: learninghub-stub
+
+x-service-env: &service-env
+  SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://keycloak:8080/auth/realms/learninghub/protocol/openid-connect/certs
+  EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-service:8761/eureka/
+  # keep the 9 JVMs inside the 6 GiB podman machine (each service is ~430 MB RSS unbounded)
+  JAVA_TOOL_OPTIONS: -Xmx256m -XX:MaxMetaspaceSize=128m -Xss512k -XX:+UseSerialGC -XX:TieredStopAtLevel=1
+
+services:
+
+  postgres:
+    image: learninghub-stub/postgres
+    build:
+      context: postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    expose:
+      - "5432"
+    ports:
+      - "6545:5432"
+    environment:
+      POSTGRES_MULTIPLE_DATABASES: keycloak,userdb,scheduledb,enrollmentdb,learningdb,assessmentdb,paymentdb
+      POSTGRES_USER: pguser
+      POSTGRES_PASSWORD: pgpass
+    networks:
+      - lh-internal
+
+  keycloak:
+    image: learninghub-stub/keycloak
+    build:
+      context: keycloak
+    environment:
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://postgres:5432/keycloak
+      KC_DB_USERNAME: pguser
+      KC_DB_PASSWORD: pgpass
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: ${LH_KEYCLOAK_PASSWORD:-password}
+      KC_PROXY_HEADERS: xforwarded
+      KC_HOSTNAME_STRICT: "false"
+      JAVA_OPTS_KC_HEAP: -Xms128m -Xmx512m
+    expose:
+      - "8080"
+    ports:
+      - "9180:8080"
+    depends_on:
+      - postgres
+    networks:
+      - lh-internal
+
+  user-service:
+    image: learninghub-stub/user-service
+    build:
+      context: services/user-service
+    expose:
+      - "8101"
+    environment:
+      <<: *service-env
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/userdb
+      LEARNINGHUB_KEYCLOAK_BASEURL: http://keycloak:8080/auth
+      LH_KEYCLOAK_ADMIN_CLIENT_SECRET: ${LH_KEYCLOAK_ADMIN_CLIENT_SECRET:-learninghub-user-admin-secret}
+    depends_on:
+      - postgres
+      - keycloak
+    networks:
+      - lh-internal
+
+  schedule-service:
+    image: learninghub-stub/schedule-service
+    build:
+      context: services/schedule-service
+    expose:
+      - "8103"
+    environment:
+      <<: *service-env
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/scheduledb
+    depends_on:
+      - postgres
+      - keycloak
+    networks:
+      - lh-internal
+
+  enrollment-service:
+    image: learninghub-stub/enrollment-service
+    build:
+      context: services/enrollment-service
+    expose:
+      - "8104"
+    environment:
+      <<: *service-env
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/enrollmentdb
+    depends_on:
+      - postgres
+      - keycloak
+    networks:
+      - lh-internal
+
+  learning-service:
+    image: learninghub-stub/learning-service
+    build:
+      context: services/learning-service
+    expose:
+      - "8105"
+    environment:
+      <<: *service-env
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/learningdb
+    depends_on:
+      - postgres
+      - keycloak
+    networks:
+      - lh-internal
+
+  assessment-service:
+    image: learninghub-stub/assessment-service
+    build:
+      context: services/assessment-service
+    expose:
+      - "8106"
+    environment:
+      <<: *service-env
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/assessmentdb
+    depends_on:
+      - postgres
+      - keycloak
+    networks:
+      - lh-internal
+
+  payment-service:
+    image: learninghub-stub/payment-service
+    build:
+      context: services/payment-service
+    expose:
+      - "8107"
+    environment:
+      <<: *service-env
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/paymentdb
+    depends_on:
+      - postgres
+      - keycloak
+    networks:
+      - lh-internal
+
+  dashboard-service:
+    image: learninghub-stub/dashboard-service
+    build:
+      context: services/dashboard-service
+    expose:
+      - "8108"
+    environment:
+      <<: *service-env
+    depends_on:
+      - keycloak
+    networks:
+      - lh-internal
+
+  discovery-service:
+    image: learninghub-stub/discovery-service
+    build:
+      context: services/discovery-service
+    expose:
+      - "8761"
+    ports:
+      - "9761:8761"
+    environment:
+      JAVA_TOOL_OPTIONS: -Xmx192m -XX:MaxMetaspaceSize=128m -Xss512k -XX:+UseSerialGC -XX:TieredStopAtLevel=1
+    networks:
+      - lh-internal
+
+  gateway-service:
+    image: learninghub-stub/gateway-service
+    build:
+      context: services/gateway-service
+    ports:
+      - "8080:8090"
+    environment:
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-service:8761/eureka/
+      KEYCLOAK_URL: http://keycloak:8080
+      FRONTEND_URL: http://frontend:80
+      JAVA_TOOL_OPTIONS: -Xmx256m -XX:MaxMetaspaceSize=128m -Xss512k -XX:+UseSerialGC -XX:TieredStopAtLevel=1
+    depends_on:
+      - discovery-service
+      - keycloak
+      - frontend
+    networks:
+      - lh-internal
+
+  frontend:
+    image: learninghub-stub/frontend
+    build:
+      context: frontend
+    expose:
+      - "80"
+    depends_on:
+      - keycloak
+    networks:
+      - lh-internal
+
+volumes:
+  postgres_data:
+
+networks:
+  lh-internal:
