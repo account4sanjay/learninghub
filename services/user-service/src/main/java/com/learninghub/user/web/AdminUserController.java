@@ -63,7 +63,6 @@ public class AdminUserController {
                              @Schema(example = "Dr", allowableValues = {"Mr", "Ms", "Dr", ""}) @Pattern(regexp = "Mr|Ms|Dr|") String title, @Schema(example = "female", allowableValues = {"male", "female", ""}) @Pattern(regexp = "male|female|") String gender,
                              @Pattern(regexp = "freshman|sophomore|junior|senior|") String gradeLevel) {}
 
-    /** Ask 46: grade levels are owned by enrollment-service; the profile stores only the id and names are resolved best effort. */
     private final com.learninghub.user.common.Academic academic;
 
     /** Keycloak identity + the profile-table extras the admin UI shows. */

@@ -1,0 +1,2208 @@
+{
+  "info": {
+    "_postman_id": "8618a2c9-aef9-4525-948d-94167f0ad122",
+    "name": "LearningHub",
+    "description": "Every API of the LearningHub services, through the gateway. Every request sends a Bearer token from the collection variable `token`. A pre-request script signs in automatically as `loginUser` / `loginPassword` (admin1 by default) whenever that token is empty or expiring; to switch user, send one of the Login requests, or change the two variables. In the team (stub) build only the worked examples answer for the admin role, everything else returns 501 Not Implemented with the owning service and owner.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "if (pm.request.url.toString().includes('/openid-connect/token')) return;",
+          "const token = pm.collectionVariables.get('token');",
+          "let valid = false;",
+          "if (token) { try { const c = JSON.parse(atob(token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/'))); valid = c.exp * 1000 > Date.now() + 60000; } catch (e) {} }",
+          "if (valid) return;",
+          "const base = pm.collectionVariables.get('baseUrl');",
+          "const user = pm.collectionVariables.get('loginUser'), pass = pm.collectionVariables.get('loginPassword');",
+          "pm.sendRequest({ url: base + '/auth/realms/learninghub/protocol/openid-connect/token', method: 'POST',",
+          "  header: { 'Content-Type': 'application/x-www-form-urlencoded' },",
+          "  body: { mode: 'urlencoded', urlencoded: [",
+          "    { key: 'grant_type', value: 'password' }, { key: 'client_id', value: 'learninghub-frontend' },",
+          "    { key: 'username', value: user }, { key: 'password', value: pass } ] } },",
+          "  (err, res) => {",
+          "    if (err || res.code !== 200) { console.error('auto sign-in failed as ' + user + ':', err || res.code + ' ' + res.text()); return; }",
+          "    const body = res.json();",
+          "    pm.collectionVariables.set('token', body.access_token);",
+          "    pm.collectionVariables.set('refreshToken', body.refresh_token);",
+          "    pm.collectionVariables.set('username', user);",
+          "    console.log('auto signed in as', user);",
+          "  });"
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080"
+    },
+    {
+      "key": "token",
+      "value": ""
+    },
+    {
+      "key": "refreshToken",
+      "value": ""
+    },
+    {
+      "key": "username",
+      "value": ""
+    },
+    {
+      "key": "loginUser",
+      "value": "admin1"
+    },
+    {
+      "key": "loginPassword",
+      "value": "admin123"
+    }
+  ],
+  "item": [
+    {
+      "name": "Login",
+      "description": "Password grant against Keycloak. Pick a role, send, then call anything.",
+      "item": [
+        {
+          "name": "Login as admin1 (admin)",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/auth/realms/learninghub/protocol/openid-connect/token",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "realms",
+                "learninghub",
+                "protocol",
+                "openid-connect",
+                "token"
+              ]
+            },
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "grant_type",
+                  "value": "password"
+                },
+                {
+                  "key": "client_id",
+                  "value": "learninghub-frontend"
+                },
+                {
+                  "key": "username",
+                  "value": "admin1"
+                },
+                {
+                  "key": "password",
+                  "value": "admin123"
+                }
+              ]
+            },
+            "description": "Keycloak password grant through the gateway. The test script stores access_token in the collection variable `token`, which every other request sends as a Bearer token. Tokens last 30 minutes: run this again when calls start returning 401."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('token issued', () => pm.response.to.have.status(200));",
+                  "const body = pm.response.json();",
+                  "pm.collectionVariables.set('token', body.access_token);",
+                  "pm.collectionVariables.set('refreshToken', body.refresh_token);",
+                  "const claims = JSON.parse(atob(body.access_token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));",
+                  "pm.collectionVariables.set('username', claims.preferred_username);",
+                  "console.log('signed in as', claims.preferred_username, 'roles', (claims.realm_access || {}).roles);"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Login as janderson (teacher)",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/auth/realms/learninghub/protocol/openid-connect/token",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "realms",
+                "learninghub",
+                "protocol",
+                "openid-connect",
+                "token"
+              ]
+            },
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "grant_type",
+                  "value": "password"
+                },
+                {
+                  "key": "client_id",
+                  "value": "learninghub-frontend"
+                },
+                {
+                  "key": "username",
+                  "value": "janderson"
+                },
+                {
+                  "key": "password",
+                  "value": "teacher123"
+                }
+              ]
+            },
+            "description": "Keycloak password grant through the gateway. The test script stores access_token in the collection variable `token`, which every other request sends as a Bearer token. Tokens last 30 minutes: run this again when calls start returning 401."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('token issued', () => pm.response.to.have.status(200));",
+                  "const body = pm.response.json();",
+                  "pm.collectionVariables.set('token', body.access_token);",
+                  "pm.collectionVariables.set('refreshToken', body.refresh_token);",
+                  "const claims = JSON.parse(atob(body.access_token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));",
+                  "pm.collectionVariables.set('username', claims.preferred_username);",
+                  "console.log('signed in as', claims.preferred_username, 'roles', (claims.realm_access || {}).roles);"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Login as student1 (student)",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/auth/realms/learninghub/protocol/openid-connect/token",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "realms",
+                "learninghub",
+                "protocol",
+                "openid-connect",
+                "token"
+              ]
+            },
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "grant_type",
+                  "value": "password"
+                },
+                {
+                  "key": "client_id",
+                  "value": "learninghub-frontend"
+                },
+                {
+                  "key": "username",
+                  "value": "student1"
+                },
+                {
+                  "key": "password",
+                  "value": "student123"
+                }
+              ]
+            },
+            "description": "Keycloak password grant through the gateway. The test script stores access_token in the collection variable `token`, which every other request sends as a Bearer token. Tokens last 30 minutes: run this again when calls start returning 401."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('token issued', () => pm.response.to.have.status(200));",
+                  "const body = pm.response.json();",
+                  "pm.collectionVariables.set('token', body.access_token);",
+                  "pm.collectionVariables.set('refreshToken', body.refresh_token);",
+                  "const claims = JSON.parse(atob(body.access_token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));",
+                  "pm.collectionVariables.set('username', claims.preferred_username);",
+                  "console.log('signed in as', claims.preferred_username, 'roles', (claims.realm_access || {}).roles);"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Login as {{loginUser}} / {{loginPassword}}",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/auth/realms/learninghub/protocol/openid-connect/token",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "realms",
+                "learninghub",
+                "protocol",
+                "openid-connect",
+                "token"
+              ]
+            },
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "grant_type",
+                  "value": "password"
+                },
+                {
+                  "key": "client_id",
+                  "value": "learninghub-frontend"
+                },
+                {
+                  "key": "username",
+                  "value": "{{loginUser}}"
+                },
+                {
+                  "key": "password",
+                  "value": "{{loginPassword}}"
+                }
+              ]
+            },
+            "description": "Keycloak password grant through the gateway. The test script stores access_token in the collection variable `token`, which every other request sends as a Bearer token. Tokens last 30 minutes: run this again when calls start returning 401."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('token issued', () => pm.response.to.have.status(200));",
+                  "const body = pm.response.json();",
+                  "pm.collectionVariables.set('token', body.access_token);",
+                  "pm.collectionVariables.set('refreshToken', body.refresh_token);",
+                  "const claims = JSON.parse(atob(body.access_token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));",
+                  "pm.collectionVariables.set('username', claims.preferred_username);",
+                  "console.log('signed in as', claims.preferred_username, 'roles', (claims.realm_access || {}).roles);"
+                ]
+              }
+            }
+          ],
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "dashboard-service",
+      "description": "Role-specific dashboard aggregation (analytics, today) computed live from the other services on every call; the service stores nothing. Click **Authorize**, enter a username and password and Swagger fetches the Keycloak token itself (password flow, client learninghub-frontend); Tokens last 30 minutes: when calls start returning 401, click Authorize → Logout → Authorize again. Demo users: admin1/admin123, janderson/teacher123, student1/student123.",
+      "item": [
+        {
+          "name": "Dashboard",
+          "item": [
+            {
+              "name": "GET /api/dashboard/analytics — Dashboard analytics by role",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/dashboard/analytics",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "dashboard",
+                    "analytics"
+                  ]
+                },
+                "description": "The response shape depends on the caller's role (the Examples dropdown has one entry per role — Swagger shows the first one, student, by default). Shape depends on the caller's role: student (progress, pending, classes completed), teacher (classes taught, students, assessments, submissions, myClasses), admin (users by role, subjects, enrollment, performance, subjects)."
+              },
+              "response": []
+            },
+            {
+              "name": "GET /api/dashboard/today — Today's classes",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/dashboard/today",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "dashboard",
+                    "today"
+                  ]
+                },
+                "description": "Proxied from schedule-service /api/schedule/today (role-filtered there). Empty on days without classes, e.g. weekends; the example shows a weekday."
+              },
+              "response": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "user-service",
+      "description": "**STUB BUILD — every endpoint of this service returns 501 Not Implemented until David Coulter implements it, except, for the admin role only, the worked example GET /api/users/profile; the contract below is what to build.** Profile, teacher directory, avatars and admin user management (Keycloak Admin API). Click **Authorize**, enter a username and password and Swagger fetches the Keycloak token itself (password flow, client learninghub-frontend); Tokens last 30 minutes: when calls start returning 401, click Authorize → Logout → Authorize again. Demo users: admin1/admin123, teacher1/teacher123, student1/student123.",
+      "item": [
+        {
+          "name": "Me",
+          "item": [
+            {
+              "name": "GET /api/users/me — Who am I",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/users/me",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "users",
+                    "me"
+                  ]
+                },
+                "description": "Username, name, email and app roles straight from the Keycloak token (also used by the SPA as a cold-start probe)."
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Admin · users",
+          "item": [
+            {
+              "name": "GET /api/users/admin/users — List users",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/users/admin/users",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "users",
+                    "admin",
+                    "users"
+                  ]
+                },
+                "description": "Every Keycloak user (service accounts excluded) with app role, enabled flag and profile extras."
+              },
+              "response": []
+            },
+            {
+              "name": "POST /api/users/admin/users — Create a user",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/users/admin/users",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "users",
+                    "admin",
+                    "users"
+                  ]
+                },
+                "description": "Creates the Keycloak account (password, role, enabled) and the app profile (title, gender, grade level).",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"username\": \"tnguyen\",\n  \"firstName\": \"Taylor\",\n  \"lastName\": \"Nguyen\",\n  \"email\": \"tnguyen@learninghub.local\",\n  \"password\": \"student123\",\n  \"role\": \"student\",\n  \"enabled\": true,\n  \"title\": \"Ms\",\n  \"gender\": \"female\",\n  \"gradeLevel\": \"junior\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "PUT /api/users/admin/users/{id} — Update a user",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/users/admin/users/:id",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "users",
+                    "admin",
+                    "users",
+                    ":id"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "string"
+                    }
+                  ]
+                },
+                "description": "Any subset of name, email, password, role, enabled, title, gender, gradeLevel; absent keys are unchanged.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"firstName\": \"John\",\n  \"lastName\": \"Anderson\",\n  \"email\": \"janderson@learninghub.local\",\n  \"password\": \"teacher123\",\n  \"role\": \"teacher\",\n  \"enabled\": true,\n  \"title\": \"Dr\",\n  \"gender\": \"female\",\n  \"gradeLevel\": \"string\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "DELETE /api/users/admin/users/{id} — Delete a user",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/users/admin/users/:id",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "users",
+                    "admin",
+                    "users",
+                    ":id"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "string"
+                    }
+                  ]
+                },
+                "description": "Removes the Keycloak account and the app profile. You cannot delete yourself."
+              },
+              "response": []
+            },
+            {
+              "name": "POST /api/users/admin/users/{id}/activate — Activate a user",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/users/admin/users/:id/activate",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "users",
+                    "admin",
+                    "users",
+                    ":id",
+                    "activate"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "string"
+                    }
+                  ]
+                },
+                "description": "Sets enabled=true in Keycloak."
+              },
+              "response": []
+            },
+            {
+              "name": "POST /api/users/admin/users/{id}/avatar — Upload a user's picture",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/users/admin/users/:id/avatar",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "users",
+                    "admin",
+                    "users",
+                    ":id",
+                    "avatar"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "string"
+                    }
+                  ]
+                },
+                "description": "Stores the picture in the profile table; it is then served at /api/users/avatar/{username}.",
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "file",
+                      "type": "file",
+                      "src": "",
+                      "value": ""
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "POST /api/users/admin/users/{id}/suspend — Suspend a user",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/users/admin/users/:id/suspend",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "users",
+                    "admin",
+                    "users",
+                    ":id",
+                    "suspend"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "string"
+                    }
+                  ]
+                },
+                "description": "Sets enabled=false in Keycloak; the user gets 'Account disabled' at login. You cannot suspend yourself."
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Teachers",
+          "item": [
+            {
+              "name": "GET /api/users/teachers — List teachers",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/users/teachers",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "users",
+                    "teachers"
+                  ]
+                },
+                "description": "All teacher profiles with display name (title + first + last) and avatar URL."
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Profile",
+          "item": [
+            {
+              "name": "GET /api/users/profile — My profile",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/users/profile",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "users",
+                    "profile"
+                  ]
+                },
+                "description": "Students get classes, guardian, academic info and stat tiles; teachers/admins get only the personal block. Name is title + first + last."
+              },
+              "response": []
+            },
+            {
+              "name": "PUT /api/users/profile — Update my profile",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/users/profile",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "users",
+                    "profile"
+                  ]
+                },
+                "description": "Any subset of title, firstName, lastName, gender, phone, location, bio, address, email, preferences{timezone,notifications}, guardian{name,relation,email,phone}. Name and email are mirrored to Keycloak.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"fullName\": \"Sam Student\",\n  \"title\": \"Mr\",\n  \"firstName\": \"Sam\",\n  \"lastName\": \"Student\",\n  \"gender\": \"male\",\n  \"phone\": \"(408) 555-0123\",\n  \"location\": \"Sunnyvale, CA\",\n  \"bio\": \"I enjoy math and computer science.\",\n  \"address\": 1234,\n  \"email\": \"student1@learninghub.local\",\n  \"preferences\": {\n    \"timezone\": \"Pacific Time (PT)\",\n    \"notifications\": \"Email only\"\n  },\n  \"guardian\": {\n    \"name\": \"Sarah Smith\",\n    \"relation\": \"Parent/Guardian\",\n    \"email\": \"sarah.smith@gmail.com\",\n    \"phone\": \"(408) 555-0124\"\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Directory",
+          "item": [
+            {
+              "name": "GET /api/users/directory — User directory",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/users/directory",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "users",
+                    "directory"
+                  ]
+                },
+                "description": "All profiles sorted by role, last and first name; students are included."
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Avatars",
+          "item": [
+            {
+              "name": "GET /api/users/avatar/{username} — Get a user's picture (public)",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/users/avatar/:username",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "users",
+                    "avatar",
+                    ":username"
+                  ],
+                  "variable": [
+                    {
+                      "key": "username",
+                      "value": "string"
+                    }
+                  ]
+                },
+                "description": "Returns the stored picture (image/png, image/jpeg, image/svg+xml, …) or the default avatar for the profile's gender. No token required."
+              },
+              "response": []
+            },
+            {
+              "name": "PUT /api/users/profile/avatar — Upload my picture",
+              "request": {
+                "method": "PUT",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/users/profile/avatar",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "users",
+                    "profile",
+                    "avatar"
+                  ]
+                },
+                "description": "Replaces the caller's own picture (multipart part 'file', image/*, ≤ 2 MB).",
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "file",
+                      "type": "file",
+                      "src": "",
+                      "value": ""
+                    }
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "schedule-service",
+      "description": "**STUB BUILD — every endpoint of this service returns 501 Not Implemented until Victoria Achom implements it, except, for the admin role only, the worked example GET /api/schedule/terms; the contract below is what to build.** Terms (owned here), weekly/term/month/today timetables computed from class-session slots enriched with course facts from enrollment-service (role-aware), and the by-course slot written by the admin Subjects page. Click **Authorize**, enter a username and password and Swagger fetches the Keycloak token itself (password flow, client learninghub-frontend); Tokens last 30 minutes: when calls start returning 401, click Authorize → Logout → Authorize again. Demo users: admin1/admin123, teacher1/teacher123, student1/student123.",
+      "item": [
+        {
+          "name": "Class sessions",
+          "item": [
+            {
+              "name": "GET /api/schedule/sessions — Class-session slots",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/schedule/sessions",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "schedule",
+                    "sessions"
+                  ]
+                },
+                "description": "Every course's slot across all terms: courseId, termId, days, startTime/endTime (HH:mm), start/end (display), startDate/endDate (ISO). Read by enrollment-service to show days and times on the catalog, My classes, roster and Subjects pages."
+              },
+              "response": []
+            },
+            {
+              "name": "PUT /api/schedule/sessions/by-course/{courseId} — Upsert the slot of a course (admin)",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/schedule/sessions/by-course/:courseId",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "schedule",
+                    "sessions",
+                    "by-course",
+                    ":courseId"
+                  ],
+                  "variable": [
+                    {
+                      "key": "courseId",
+                      "value": "string"
+                    }
+                  ]
+                },
+                "description": "Creates or updates the single slot for a course id: termId, 1–7 days of Mon–Sun, startTime on the hour; endTime defaults to startTime + 1 h and anything else is rejected; startDate/endDate default to the term's dates. Called by the admin Subjects page after the course is saved in enrollment-service.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"termId\": \"q1-2026\",\n  \"days\": [\n    \"Mon\",\n    \"Wed\",\n    \"Fri\"\n  ],\n  \"startTime\": \"08:00\",\n  \"endTime\": \"09:00\",\n  \"startDate\": \"2026-08-24\",\n  \"endDate\": \"2026-10-23\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "DELETE /api/schedule/sessions/by-course/{courseId} — Delete the slot of a course (admin)",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/schedule/sessions/by-course/:courseId",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "schedule",
+                    "sessions",
+                    "by-course",
+                    ":courseId"
+                  ],
+                  "variable": [
+                    {
+                      "key": "courseId",
+                      "value": "string"
+                    }
+                  ]
+                },
+                "description": "204 when removed, 404 when no slot exists for the course. Called by the admin Subjects page after the course is deleted in enrollment-service."
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Schedule",
+          "item": [
+            {
+              "name": "GET /api/schedule/month — Month grid",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/schedule/month",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "schedule",
+                    "month"
+                  ],
+                  "query": [
+                    {
+                      "key": "year",
+                      "value": "2026",
+                      "description": "",
+                      "disabled": true
+                    },
+                    {
+                      "key": "month",
+                      "value": "9",
+                      "description": "",
+                      "disabled": true
+                    }
+                  ]
+                },
+                "description": "Calendar data for a month (defaults to the current month): first weekday (0 = Sunday), day count, today, per-day class entries."
+              },
+              "response": []
+            },
+            {
+              "name": "GET /api/schedule/term — Term overview",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/schedule/term",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "schedule",
+                    "term"
+                  ]
+                },
+                "description": "One bar per class with % positions across the quarter term."
+              },
+              "response": []
+            },
+            {
+              "name": "GET /api/schedule/terms — Terms",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/schedule/terms",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "schedule",
+                    "terms"
+                  ]
+                },
+                "description": "The quarter terms of the academic year in quarter order with ISO dates; the current one is flagged. Read by the term picker, the admin Subjects page and every other service (enrollment, learning, assessment, payment, user)."
+              },
+              "response": []
+            },
+            {
+              "name": "GET /api/schedule/today — Today's classes",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/schedule/today",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "schedule",
+                    "today"
+                  ]
+                },
+                "description": "Class meetings on the current date (also consumed by dashboard-service). detail = grade level. Empty on days without classes, e.g. weekends; the example shows a weekday."
+              },
+              "response": []
+            },
+            {
+              "name": "GET /api/schedule/week — Weekly timetable",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/schedule/week",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "schedule",
+                    "week"
+                  ]
+                },
+                "description": "Mon–Sun of the current week: hours span, blocks, mini-calendar dots and the next 4 meetings. Role-filtered: students see only enrolled classes, teachers only the classes they teach, admins everything. Subject, grade level, teacher and colour come from enrollment-service."
+              },
+              "response": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "enrollment-service",
+      "description": "**STUB BUILD — every endpoint of this service returns 501 Not Implemented until Renae Nicole Weiss implements it, except, for the admin role only, the worked example GET /api/enrollment/my-classes; the contract below is what to build.** Course catalogue (the owner of courses, enrollments and grade levels), my classes, enrol/drop, admin subject management and the enrolment roster. Terms and class-session slots are read from schedule-service, teacher names from user-service (Ask 46). Click **Authorize**, enter a username and password and Swagger fetches the Keycloak token itself (password flow, client learninghub-frontend); Tokens last 30 minutes: when calls start returning 401, click Authorize → Logout → Authorize again. Demo users: admin1/admin123, teacher1/teacher123, student1/student123.",
+      "item": [
+        {
+          "name": "Enrollment views",
+          "item": [
+            {
+              "name": "GET /api/enrollment/classes — Class catalog",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/enrollment/classes",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "enrollment",
+                    "classes"
+                  ]
+                },
+                "description": "Every subject of the current term with the caller's enrolment status (added/available) and the filter options (subjects, days Mon–Sun, teachers, gradeLevels). Days and times come from schedule-service slots."
+              },
+              "response": []
+            },
+            {
+              "name": "GET /api/enrollment/courses — Courses (catalogue)",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/enrollment/courses",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "enrollment",
+                    "courses"
+                  ]
+                },
+                "description": "Every course of every term with its grade level, teacher (username + display name from user-service), credits and colour — no times (those are schedule-service slots). Read by schedule-, learning-, assessment- and payment-service to resolve a course id."
+              },
+              "response": []
+            },
+            {
+              "name": "DELETE /api/enrollment/drop/{courseId} — Drop a subject (student)",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/enrollment/drop/:courseId",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "enrollment",
+                    "drop",
+                    ":courseId"
+                  ],
+                  "variable": [
+                    {
+                      "key": "courseId",
+                      "value": "string"
+                    }
+                  ]
+                },
+                "description": "Removes the caller's enrollment for the course id."
+              },
+              "response": []
+            },
+            {
+              "name": "POST /api/enrollment/enroll/{courseId} — Enrol in a subject (student)",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/enrollment/enroll/:courseId",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "enrollment",
+                    "enroll",
+                    ":courseId"
+                  ],
+                  "variable": [
+                    {
+                      "key": "courseId",
+                      "value": "string"
+                    }
+                  ]
+                },
+                "description": "Creates the caller's enrollment for the course id (idempotent). Example courseId: ap-statistics."
+              },
+              "response": []
+            },
+            {
+              "name": "GET /api/enrollment/my-classes — My classes (role-aware)",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/enrollment/my-classes",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "enrollment",
+                    "my-classes"
+                  ]
+                },
+                "description": "student → enrolled classes with credits; teacher → classes taught with studentCount (status Teaching); admin → every class (status Active). Also the role-aware course list every other service starts from."
+              },
+              "response": []
+            },
+            {
+              "name": "GET /api/enrollment/state — Enrolled course ids",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/enrollment/state",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "enrollment",
+                    "state"
+                  ]
+                },
+                "description": "Course ids the calling student is enrolled in; empty for teachers and admins."
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Grade levels",
+          "item": [
+            {
+              "name": "GET /api/enrollment/grade-levels — List grade levels",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/enrollment/grade-levels",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "enrollment",
+                    "grade-levels"
+                  ]
+                },
+                "description": "Ordered by sort_order."
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Subjects (admin)",
+          "item": [
+            {
+              "name": "GET /api/enrollment/subjects — List subjects",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/enrollment/subjects",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "enrollment",
+                    "subjects"
+                  ]
+                },
+                "description": "All subjects across terms with grade level, teacher, timetable (from schedule-service) and studentCount."
+              },
+              "response": []
+            },
+            {
+              "name": "POST /api/enrollment/subjects — Create a subject",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/enrollment/subjects",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "enrollment",
+                    "subjects"
+                  ]
+                },
+                "description": "Validates: gradeLevel from /grade-levels, termId from schedule-service /terms, teacherUsername present, credits 1–6. The id is slugged from name + gradeLevel when omitted. Then PUT the slot to /api/schedule/sessions/by-course/{id}.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"id\": \"ap-precalc\",\n  \"name\": \"AP Pre Calculus\",\n  \"gradeLevel\": \"junior\",\n  \"teacherUsername\": \"janderson\",\n  \"termId\": \"q1-2026\",\n  \"credits\": 4,\n  \"color\": \"blue\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "PUT /api/enrollment/subjects/{id} — Update a subject",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/enrollment/subjects/:id",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "enrollment",
+                    "subjects",
+                    ":id"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "string"
+                    }
+                  ]
+                },
+                "description": "Same body and validation as create. The slot is updated separately in schedule-service.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"id\": \"ap-precalc\",\n  \"name\": \"AP Pre Calculus\",\n  \"gradeLevel\": \"junior\",\n  \"teacherUsername\": \"janderson\",\n  \"termId\": \"q1-2026\",\n  \"credits\": 4,\n  \"color\": \"blue\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "DELETE /api/enrollment/subjects/{id} — Delete a subject",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/enrollment/subjects/:id",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "enrollment",
+                    "subjects",
+                    ":id"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "string"
+                    }
+                  ]
+                },
+                "description": "Removes the subject and its enrollments. The page then deletes the slot in schedule-service."
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Roster",
+          "item": [
+            {
+              "name": "GET /api/enrollment/roster — Enrolment roster by subject",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/enrollment/roster",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "enrollment",
+                    "roster"
+                  ]
+                },
+                "description": "Every subject of the current term (admin) or the caller's subjects (teacher), ordered by grade level then name, each with the enrolled students. Days and time come from schedule-service. Students receive 403."
+              },
+              "response": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "learning-service",
+      "description": "**STUB BUILD — every endpoint of this service returns 501 Not Implemented until Jay Bruhn Schraml implements it, except, for the admin role only, the worked example GET /api/learning/classes; the contract below is what to build.** Role-aware learning overview and courses with the term lesson plan per subject (teachers mark classes complete). Click **Authorize**, enter a username and password and Swagger fetches the Keycloak token itself (password flow, client learninghub-frontend); Tokens last 30 minutes: when calls start returning 401, click Authorize → Logout → Authorize again. Demo users: admin1/admin123, teacher1/teacher123, student1/student123.",
+      "item": [
+        {
+          "name": "Lesson plan",
+          "item": [
+            {
+              "name": "PUT /api/learning/plan/items/{id} — Mark a class complete / not complete",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/learning/plan/items/:id",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "learning",
+                    "plan",
+                    "items",
+                    ":id"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "1"
+                    }
+                  ]
+                },
+                "description": "Teacher of the course only. Body {\"completed\": true|false}. Records who/when, recomputes the course percent and status; every enrolled student sees the change.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"completed\": true\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "GET /api/learning/plan/{courseId} — Lesson plan of a course",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/learning/plan/:courseId",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "learning",
+                    "plan",
+                    ":courseId"
+                  ],
+                  "variable": [
+                    {
+                      "key": "courseId",
+                      "value": "string"
+                    }
+                  ]
+                },
+                "description": "Every scheduled class of the course in the current term with number, date, unit, topic and completion; counts, percent and the next class. Student: enrolled courses only; teacher: own courses; admin: all (403 otherwise). Example id: ap-precalc."
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Learning views",
+          "item": [
+            {
+              "name": "GET /api/learning/classes — Courses (role-aware)",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/learning/classes",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "learning",
+                    "classes"
+                  ]
+                },
+                "description": "student → enrolled courses (ids from enrollment-service); teacher → own courses; admin → all. Each row: classes this term, classesCompleted, classesRemaining, percent, status, nextClass, canMark."
+              },
+              "response": []
+            },
+            {
+              "name": "GET /api/learning/overview — Learning overview (role-aware)",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/learning/overview",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "learning",
+                    "overview"
+                  ]
+                },
+                "description": "Stat tiles from the term lesson plans — student: enrolled classes, classes completed (progress), next class, study hours; teacher: courses taught, classes this term, classes completed (progress), next class; admin: courses, classes this term, classes completed, study hours (all students)."
+              },
+              "response": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "assessment-service",
+      "description": "**STUB BUILD — every endpoint of this service returns 501 Not Implemented until Sai Sudha Piratla implements it, except, for the admin role only, the worked example GET /api/assessment/summary; the contract below is what to build.** Assessment views (role-aware), timed attempts, assignment submission and review; teacher authoring, submissions and grading. Click **Authorize**, enter a username and password and Swagger fetches the Keycloak token itself (password flow, client learninghub-frontend); Tokens last 30 minutes: when calls start returning 401, click Authorize → Logout → Authorize again. Demo users: admin1/admin123, teacher1/teacher123, student1/student123.",
+      "item": [
+        {
+          "name": "Assessment views",
+          "item": [
+            {
+              "name": "GET /api/assessment/list — Assessments list (role-aware)",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/assessment/list",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "assessment",
+                    "list"
+                  ]
+                },
+                "description": "student → each assessment with its status (Upcoming / Due Today / In Progress / Submitted / Completed / Overdue), due date (dueAt ISO), score and action (Start · Resume · Submit · View Submission · Review · View Details — a past-due assessment is never startable); teacher → own assessments with submissions and average; admin → all with teacher (both with dueAt for the weekly/monthly view)."
+              },
+              "response": []
+            },
+            {
+              "name": "GET /api/assessment/performance — Average score by subject",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/assessment/performance",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "assessment",
+                    "performance"
+                  ]
+                },
+                "description": "Caller's latest attempts (student/teacher) or every scored attempt (admin)."
+              },
+              "response": []
+            },
+            {
+              "name": "GET /api/assessment/summary — Assessments summary (role-aware)",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/assessment/summary",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "assessment",
+                    "summary"
+                  ]
+                },
+                "description": "student → total, average score, high scores, upcoming this week (due today · due this week) + recent results; teacher/admin → total, submissions, average, overdue + latest submissions with the student."
+              },
+              "response": []
+            },
+            {
+              "name": "GET /api/assessment/{id} — Assessment details",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/assessment/:id",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "assessment",
+                    ":id"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "string"
+                    }
+                  ]
+                },
+                "description": "Details page (no tabs): instructions, files, rubric, status block (status, action, attempts used, time limit, seconds to due, closed flag), the caller's in-progress attempt, the assignment submission (text, files, points, feedback) or the quiz result. Example id: lab-report."
+              },
+              "response": []
+            },
+            {
+              "name": "PUT /api/assessment/{id}/answers — Save answers (autosave)",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/assessment/:id/answers",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "assessment",
+                    ":id",
+                    "answers"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "string"
+                    }
+                  ]
+                },
+                "description": "Student only. Stores the answers so far on the in-progress attempt and returns the seconds left. Body: {\"answers\": {\"1\": \"B\", …}}. 409 when there is no in-progress attempt or the time is up (the attempt is then finalised from the saved answers).",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"answers\": {\n    \"1\": \"B\",\n    \"2\": \"A\"\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "POST /api/assessment/{id}/assignment — Submit an assignment",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/assessment/:id/assignment",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "assessment",
+                    ":id",
+                    "assignment"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "string"
+                    }
+                  ]
+                },
+                "description": "Student only. Stores the response text and the attached file names/sizes/types as a Submitted attempt (resubmitting before the due date replaces it). Body: {\"text\": \"…\", \"files\": [{\"name\", \"size\", \"type\"}]}. 409 when the due date has passed, the assessment is not an Assignment, or the submission is already graded.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"text\": \"Observations and analysis for the three reactions are in the attached report.\",\n  \"files\": [\n    {\n      \"name\": \"lab-report-student1.pdf\",\n      \"size\": 245760,\n      \"type\": \"application/pdf\"\n    }\n  ]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "GET /api/assessment/{id}/questions — Quiz questions",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/assessment/:id/questions",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "assessment",
+                    ":id",
+                    "questions"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "string"
+                    }
+                  ]
+                },
+                "description": "All questions in order without the correct answers, plus topics and the time limit. When the caller has an in-progress attempt the `attempt` block carries its seconds left and saved answers (timeRemaining follows the server clock). Example id: unit2-quiz."
+              },
+              "response": []
+            },
+            {
+              "name": "GET /api/assessment/{id}/review — Quiz review",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/assessment/:id/review",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "assessment",
+                    ":id",
+                    "review"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "string"
+                    }
+                  ]
+                },
+                "description": "The caller's latest finished attempt (Completed · Graded · Submitted-pending assignment): results, per-question topics and outcomes, every question with the chosen and correct answers, the assignment submission block, related learning. 404 if the caller has no finished attempt."
+              },
+              "response": []
+            },
+            {
+              "name": "POST /api/assessment/{id}/start — Start (or resume) a timed attempt",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/assessment/:id/start",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "assessment",
+                    ":id",
+                    "start"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "string"
+                    }
+                  ]
+                },
+                "description": "Student only. Creates an InProgress attempt with started_at = now and deadline_at = now + time_limit_minutes and returns the seconds left; an existing in-progress attempt is returned instead (resumed = true). 409 when the due date has passed, when attempts_allowed is used up, or for an Assignment (use /assignment)."
+              },
+              "response": []
+            },
+            {
+              "name": "POST /api/assessment/{id}/submit — Submit answers",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/assessment/:id/submit",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "assessment",
+                    ":id",
+                    "submit"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "string"
+                    }
+                  ]
+                },
+                "description": "Student only. Finalises the caller's in-progress attempt: scores the answers (body answers win over the saved ones) against question.correct, records seconds taken from started_at and marks it auto-submitted when the deadline had already passed. Without an in-progress attempt a direct attempt is created — only while the assessment is open and attempts remain (409 otherwise). Body: {\"answers\": {\"1\": \"B\", …}, \"secondsTaken\": 1470} or a bare {\"1\": \"B\", …} map.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"answers\": {\n    \"1\": \"B\",\n    \"2\": \"A\",\n    \"3\": \"D\"\n  },\n  \"secondsTaken\": 1470\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Teacher assessments",
+          "item": [
+            {
+              "name": "POST /api/assessment/teacher/assessments — Create an assessment with its questions",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/assessment/teacher/assessments",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "assessment",
+                    "teacher",
+                    "assessments"
+                  ]
+                },
+                "description": "Teacher only. Body names the courseId (one of the caller's classes); id = slug of the title + the course's grade level (numeric suffix if taken); createdBy = the caller. Questions are numbered in order. 400 on missing title/subject/gradeLevel/type/dueAt, fewer than 2 options, or a correct key not among the options.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"title\": \"Unit 3 Quiz\",\n  \"subtitle\": \"Linear Functions\",\n  \"courseId\": \"ap-precalc\",\n  \"type\": \"Quiz\",\n  \"dueAt\": \"2026-10-05T23:59:00\",\n  \"points\": 100,\n  \"attemptsAllowed\": 1,\n  \"timeLimitMinutes\": 30,\n  \"instructionsIntro\": \"Answer every question; one attempt.\",\n  \"instructionsSteps\": [\n    \"string\"\n  ],\n  \"questions\": [\n    {\n      \"text\": \"Which equation has slope 2 and intercept 1?\",\n      \"options\": [\n        {\n          \"key\": \"A\",\n          \"text\": \"y = 2x + 1\"\n        }\n      ],\n      \"correct\": \"A\",\n      \"points\": 1,\n      \"topic\": \"Linear equations\",\n      \"section\": \"Multiple Choice\",\n      \"explanation\": \"Slope-intercept form is y = mx + b.\"\n    }\n  ]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "GET /api/assessment/teacher/assessments/{id} — Editable form of an assessment",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/assessment/teacher/assessments/:id",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "assessment",
+                    "teacher",
+                    "assessments",
+                    ":id"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "string"
+                    }
+                  ]
+                },
+                "description": "Fields (courseId plus the course's subject, grade level, teacher and colour) and every question including correct answers and explanations, and the submission count. Teacher: own only; admin: any."
+              },
+              "response": []
+            },
+            {
+              "name": "PUT /api/assessment/teacher/assessments/{id} — Replace an assessment and its questions",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/assessment/teacher/assessments/:id",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "assessment",
+                    "teacher",
+                    "assessments",
+                    ":id"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "string"
+                    }
+                  ]
+                },
+                "description": "Same body as create. Attempts already made are kept. Teacher: own only; admin: any.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"title\": \"Unit 3 Quiz\",\n  \"subtitle\": \"Linear Functions\",\n  \"courseId\": \"ap-precalc\",\n  \"type\": \"Quiz\",\n  \"dueAt\": \"2026-10-05T23:59:00\",\n  \"points\": 100,\n  \"attemptsAllowed\": 1,\n  \"timeLimitMinutes\": 30,\n  \"instructionsIntro\": \"Answer every question; one attempt.\",\n  \"instructionsSteps\": [\n    \"string\"\n  ],\n  \"questions\": [\n    {\n      \"text\": \"Which equation has slope 2 and intercept 1?\",\n      \"options\": [\n        {\n          \"key\": \"A\",\n          \"text\": \"y = 2x + 1\"\n        }\n      ],\n      \"correct\": \"A\",\n      \"points\": 1,\n      \"topic\": \"Linear equations\",\n      \"section\": \"Multiple Choice\",\n      \"explanation\": \"Slope-intercept form is y = mx + b.\"\n    }\n  ]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "DELETE /api/assessment/teacher/assessments/{id} — Delete an assessment",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/assessment/teacher/assessments/:id",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "assessment",
+                    "teacher",
+                    "assessments",
+                    ":id"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "string"
+                    }
+                  ]
+                },
+                "description": "Removes the assessment, its questions and all attempts. Teacher: own only; admin: any."
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Submissions",
+          "item": [
+            {
+              "name": "GET /api/assessment/submissions — Submissions",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/assessment/submissions",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "assessment",
+                    "submissions"
+                  ],
+                  "query": [
+                    {
+                      "key": "assessment",
+                      "value": "unit2-quiz",
+                      "description": "assessment id",
+                      "disabled": true
+                    }
+                  ]
+                },
+                "description": "Finished attempts (Completed quiz/test, Submitted and Graded assignments) on the caller's assessments (admin: every assessment), newest first; optionally filtered to one assessment. Submitted rows have no score yet."
+              },
+              "response": []
+            },
+            {
+              "name": "GET /api/assessment/submissions/{attemptId} — Review one submission",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/assessment/submissions/:attemptId",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "assessment",
+                    "submissions",
+                    ":attemptId"
+                  ],
+                  "variable": [
+                    {
+                      "key": "attemptId",
+                      "value": "1"
+                    }
+                  ]
+                },
+                "description": "The review shape of that attempt (results, every question with chosen vs correct; for assignments the submission text, files, points and feedback) plus the student's username."
+              },
+              "response": []
+            },
+            {
+              "name": "POST /api/assessment/submissions/{attemptId}/grade — Grade an assignment submission",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/assessment/submissions/:attemptId/grade",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "assessment",
+                    "submissions",
+                    ":attemptId",
+                    "grade"
+                  ],
+                  "variable": [
+                    {
+                      "key": "attemptId",
+                      "value": "1"
+                    }
+                  ]
+                },
+                "description": "Teacher (own assessments). Body: {\"points\": 88, \"feedback\": \"…\"}; points 0..assessment.points. The attempt becomes Graded with percent = points / assessment.points; the student sees the points and feedback on the details page. Re-grading is allowed.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"points\": 88,\n  \"feedback\": \"Clear analysis; label the axes on graph 2.\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "payment-service",
+      "description": "**STUB BUILD — every endpoint of this service returns 501 Not Implemented until Victoria Achom implements it; the contract below is what to build.** Term tuition payments: summary, upcoming, history, methods, billing, invoice details and pay; school-wide view for admins. Click **Authorize**, enter a username and password and Swagger fetches the Keycloak token itself (password flow, client learninghub-frontend); Tokens last 30 minutes: when calls start returning 401, click Authorize → Logout → Authorize again. Demo users: admin1/admin123, teacher1/teacher123, student1/student123.",
+      "item": [
+        {
+          "name": "Invoice details",
+          "item": [
+            {
+              "name": "GET /api/payments/invoices/{id}/details — Invoice details",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/payments/invoices/:id/details",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "payments",
+                    "invoices",
+                    ":id",
+                    "details"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "1"
+                    }
+                  ]
+                },
+                "description": "The invoice as shown by View Details / Receipt: computed status (Paid, Overdue, Upcoming, Scheduled), tuition breakdown from the invoice's own lines (one per billed course, frozen at billing time; courseId references enrollment-service), payment method and date, receipt number, timeline and whether it can be paid now. Owner or admin only."
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Payments",
+          "item": [
+            {
+              "name": "GET /api/payments/billing — My billing profile",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/payments/billing",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "payments",
+                    "billing"
+                  ]
+                },
+                "description": "404 when the caller has no billing profile."
+              },
+              "response": []
+            },
+            {
+              "name": "GET /api/payments/history — Paid invoices",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/payments/history",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "payments",
+                    "history"
+                  ]
+                },
+                "description": "Paid invoices, newest first. Admin rows carry username."
+              },
+              "response": []
+            },
+            {
+              "name": "GET /api/payments/methods — My cards",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/payments/methods",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "payments",
+                    "methods"
+                  ]
+                },
+                "description": "The caller's payment methods."
+              },
+              "response": []
+            },
+            {
+              "name": "POST /api/payments/pay — Pay an invoice",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/payments/pay",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "payments",
+                    "pay"
+                  ]
+                },
+                "description": "Finds the caller's invoice by id, else by description, else the next unpaid one; marks it Paid today with the given/default card and returns the updated row.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"id\": 94\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "GET /api/payments/summary — Payment summary",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/payments/summary",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "payments",
+                    "summary"
+                  ]
+                },
+                "description": "Student: Total Paid / Upcoming / Pending / Amount Due (a student with no invoice for the current term is billed first from their enrolled courses). Admin: Total Collected / Outstanding / Overdue / Students Billed across all users."
+              },
+              "response": []
+            },
+            {
+              "name": "GET /api/payments/upcoming — Unpaid invoices",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/payments/upcoming",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "payments",
+                    "upcoming"
+                  ]
+                },
+                "description": "Unpaid invoices by due date (a student with no invoice for the current term is billed first: one line per enrolled course, $320 each); the first one gets action 'Pay Now'. Admin rows carry username."
+              },
+              "response": []
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
